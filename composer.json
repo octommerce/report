@@ -1,0 +1,13 @@
+{
+    "name": "octommerce/report",
+    "description": "Report feature.",
+    "authors": [
+        {
+            "name": "Trias Nur Rahman",
+            "email": "contact@triasrahman.com"
+        }
+    ],
+    "require": {
+    	"khill/lavacharts": "*"
+    }
+}
