@@ -2,10 +2,74 @@
 <?= $this->widget->summary->render() ?>
 </div>
 
+<div class="container">
+    <div class="row">
+        <div class="form-elements" role="form">
+            <div class="col-md-3">
+                <div class="form-group dropdown-field span-full">
+                    <label>Date Range</label>
+                    <select class="form-control custom-select" name="date_range">
+                        <option value='Last 7 days'>Last 7 days</option>
+                        <option value='Last 30 days' selected="selected">Last 30 days</option>
+                        <option value='This month'>This month</option>
+                        <option value='Last month'>Last month</option>
+                        <option value='This year'>This year</option>
+                        <option value='Custom'>Custom</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-9">
+                <div class="form-group span-left">
+                    <label>Start date</label>
+                    <input type="date" name="start_date" value="" class="form-control" />
+                </div>
+
+                <div class="form-group span-right">
+                    <label>End date</label>
+                    <input type="date" name="end_date" value="" class="form-control" />
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <table class="table">
+                <tr>
+                    <td>REVENUE</td> 
+                    <td>SALES</td> 
+                    <td>PRODUCT SOLD</td> 
+                </tr>
+                <tr>
+                    <td>1</td> 
+                    <td>2</td> 
+                    <td>3</td> 
+                </tr>
+            </table>    
+        </div>
+        <div class="col-md-6">
+            <div class="col-md-3">
+                <select class="form-control custom-select">
+                    <option>Amount</option>
+                </select>
+            </div>
+            <div class="col-md-9">
+                <button type="submit" class="btn btn-default">Month</button>
+                <button type="submit" class="btn btn-default">Week</button>
+                <button type="submit" class="btn btn-default">Day</button>
+                <button type="submit" class="btn btn-default">Time</button>
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="report-widget" id="hello-chart">
+                <div id="stocks-chart"></div>
+                <?= Lava::render('AreaChart', 'MyStocks', 'stocks-chart') ?>
+            </div>
+        </div>
+    </div>
+</div>
 <div class="control-tabs content-tabs tabs-flush" data-control="tab">
     <ul class="nav nav-tabs">
-        <li class="active"><a href="#templates">Orders</a></li>
-        <li><a href="#layouts">Products</a></li>
+        <li class="active"><a href="#templates">Products</a></li>
     </ul>
     <div class="tab-content">
         <div class="tab-pane active">
@@ -22,29 +86,9 @@
 						        </select>
 						    </div>
             			</div>
-						<div class="col-md-3">
-						    <div class="form-group dropdown-field span-full">
-						        <label>Date Range</label>
-						        <select class="form-control custom-select">
-						            <option>Last 7 days</option>
-						            <option selected="selected">Last 30 days</option>
-						            <option>This month</option>
-						            <option>Last month</option>
-						            <option>This year</option>
-						            <option>Custom</option>
-						        </select>
-						    </div>
-            			</div>
             		</div>
             	</div>
             </div>
-			<div class="report-widget">
-				<div id="stocks-chart"></div>
-				<?= Lava::render('AreaChart', 'MyStocks', 'stocks-chart') ?>
-			</div>
-
-        </div>
-        <div class="tab-pane">
         </div>
     </div>
 </div>

@@ -28,6 +28,8 @@ class Reports extends Controller
 
     public function index()
     {
+        $this->AddJs('/plugins/octommerce/report/assets/js/app.js');
+
         $this->bodyClass = 'compact-container';
 
         // $this->vars['dataAllOrders'] = $this->getLastOrdersData(30, false);
