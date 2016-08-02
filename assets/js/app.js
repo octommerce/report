@@ -10,10 +10,10 @@ $(document).ready(function () {
                     console.log(chart);
                 });
             });
-            $('.custom-date-range').prop('disabled', true);
+            // $('.custom-date-range').prop('disabled', true);
         }
         else {
-            $('.custom-date-range').prop('disabled', false);
+            // $('.custom-date-range').prop('disabled', false);
         }
     });
 

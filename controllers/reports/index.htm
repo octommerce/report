@@ -1,98 +1,135 @@
-<div class="report-container">
-    <div class="report-widget">
-        <div class="page-header">
-            <h1>E-commerce Summary</h1>
+<form class="form-elements" role="form">
+    <div class="row">
+        <div class="col-md-6">
+            <h1>Report</h1>
         </div>
-        <div class="form-elements" role="form">
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="form-group dropdown-field span-full">
-                        <label>Date Range</label>
-                        <select class="form-control custom-select" name="date_range">
-                            <option value='Last 7 days'>Last 7 days</option>
-                            <option value='Last 30 days' selected="selected">Last 30 days</option>
-                            <option value='This month'>This month</option>
-                            <option value='Last month'>Last month</option>
-                            <option value='This year'>This year</option>
-                            <option value='Custom'>Custom</option>
-                        </select>
-                    </div>
-                </div>
-                <div class="col-md-9">
-                    <div class="form-group span-left">
-                        <label>Start date</label>
-                        <input type="date" name="start_date" value="" class="form-control custom-date-range" disabled/>
-                    </div>
-
-                    <div class="form-group span-right">
-                        <label>End date</label>
-                        <input type="date" name="end_date" value="" class="form-control custom-date-range" disabled/>
-                    </div>
-                </div>
+        <div class="col-md-3">
+            <div class="dropdown-field span-full">
+                <label>Date Range</label>
+                <select class="form-control custom-select" name="date_range">
+                    <option value='Last 7 days'>Last 7 days</option>
+                    <option value='Last 30 days' selected="selected">Last 30 days</option>
+                    <option value='This month'>This month</option>
+                    <option value='Last month'>Last month</option>
+                    <option value='This year'>This year</option>
+                    <option value='Custom'>Custom</option>
+                </select>
             </div>
         </div>
-    </div>
-
-    <div class="report-widget">
-        <div class="scoreboard">
-            <div class="scoreboard-item title-value">
-                <h4>Revenue</h4>
-                <p class="positive">IDR 30,3m</p>
-                <p class="description"></p>
+        <div class="col-md-3 hide" data-trigger="[name=date_range]"
+            data-trigger-action="show"
+            data-trigger-condition="value[Custom]"
+            data-trigger-closest-parent="form">
+            <div class="form-group span-left" style="padding-bottom: 0">
+                <label>Start date</label>
+                <div class="field-datepicker" data-control="datepicker" data-disposable>
+                    <div class="input-with-icon right-align">
+                        <i class="icon icon-calendar-o"></i>
+                        <input type="text" name="" class="form-control align-right custom-date-range" autocomplete="off" data-datepicker>
+                    </div>
+                    <input type="hidden" name="start_date" value="" data-datetime-value>
+                </div>
             </div>
-
-            <div class="scoreboard-item title-value">
-                <h4>Sales</h4>
-                <p class="oc-icon-shopping-cart">294</p>
-                <p class="description"></p>
-            </div>
-
-            <div class="scoreboard-item title-value">
-                <h4>Products Sold</h4>
-                <p>10,021</p>
-            </div>
-
-            <div class="scoreboard-item">
-                <div class="btn-group">
-                    <a href="#" class="btn btn-default">Month</a>
-                    <a href="#" class="btn btn-default">Week</a>
-                    <a href="#" class="btn btn-default">Day</a>
-                    <a href="#" class="btn btn-default">Time</a>
+            <div class="form-group span-right" style="padding-bottom: 0">
+                <label>End date</label>
+                <div class="field-datepicker" data-control="datepicker" data-disposable>
+                    <div class="input-with-icon right-align">
+                        <i class="icon icon-calendar-o"></i>
+                        <input type="text" class="form-control align-right custom-date-range" autocomplete="off" data-datepicker>
+                    </div>
+                    <input type="hidden" name="end_date" value="" data-datetime-value>
                 </div>
             </div>
         </div>
     </div>
+</form>
+
+<hr>
+
+<div class="clearfix">
+    <div class="scoreboard">
+        <div class="scoreboard-item title-value">
+            <h4>Revenue</h4>
+            <p class="positive">IDR 30,392,200</p>
+            <p class="description"></p>
+        </div>
+
+        <div class="scoreboard-item title-value">
+            <h4>Transactions</h4>
+            <p class="oc-icon-shopping-cart">294</p>
+            <p class="description"></p>
+        </div>
+
+        <div class="scoreboard-item title-value">
+            <h4>Avg. Order Value</h4>
+            <p class="positive">IDR 180,200</p>
+            <p class="description"></p>
+        </div>
+
+        <div class="scoreboard-item title-value">
+            <h4>Products Sold</h4>
+            <p>10,021</p>
+        </div>
+
+        <div class="scoreboard-item pull-right">
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-default">
+                    <input type="radio" name="interval" id="" autocomplete="off"> Month
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" name="interval" id="" autocomplete="off"> Week
+                </label>
+                <label class="btn btn-default active">
+                    <input type="radio" name="interval" id="" autocomplete="off" checked> Day
+                </label>
+                <label class="btn btn-default">
+                    <input type="radio" name="interval" id="" autocomplete="off"> Time
+                </label>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="report-container" style="margin-bottom: 30px;">
     <div class="report-widget" id="hello-chart">
         <div id="stocks-chart"></div>
         <?= Lava::render('AreaChart', 'MyStocks', 'stocks-chart') ?>
     </div>
 </div>
-<div class="control-tabs content-tabs tabs-flush" data-control="tab">
+
+<div class="control-tabs primary-tabs" data-control="tab">
     <ul class="nav nav-tabs">
-        <li class="active"><a href="#templates">Products</a></li>
+        <li class="active">
+            <a href="#">Products</a>
+        </li>
+        <li>
+            <a href="#">Categories</a>
+        </li>
+        <li>
+            <a href="#">Brands</a>
+        </li>
+        <li>
+            <a href="#">Payment Methods</a>
+        </li>
+        <li>
+            <a href="#">Locations</a>
+        </li>
     </ul>
     <div class="tab-content">
         <div class="tab-pane active">
-            <div class="toolbar-widget list-header">
-            	<div class="control-toolbar">
-            		<div class="row">
-            			<div class="col-md-3">
-						    <div class="form-group dropdown-field span-full">
-						        <label>Type</label>
-						        <select class="form-control custom-select">
-						            <option selected="selected" value="2">Sales by date</option>
-						            <option value="3">Sales by product</option>
-						            <option value="3">Sales by category</option>
-						        </select>
-						    </div>
-            			</div>
-            		</div>
-            	</div>
-            </div>
+            Products
+        </div>
+        <div class="tab-pane">
+            Categories
+        </div>
+        <div class="tab-pane">
+            Brands
+        </div>
+        <div class="tab-pane">
+            Payment Methods
+        </div>
+        <div class="tab-pane">
+            Locations
         </div>
     </div>
-</div>
-
-<div>
-
 </div>
