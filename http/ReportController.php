@@ -96,6 +96,8 @@ class ReportController extends Controller
                 $endDate = new Carbon('last day of December ' . date('Y'));
                 break;
             case 'Custom':
+                $startDate = Carbon::parse(Input::get('start_date'));
+                $endDate = Carbon::parse(Input::get('end_date'))->addDays(1);
                 break;
         }
 
