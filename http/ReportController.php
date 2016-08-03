@@ -12,7 +12,7 @@ class ReportController extends Controller
     /**
      * Get orders data
      *
-     * @return $stocksTable
+     * @return $data
      */
     public function getData()
     {
@@ -40,17 +40,21 @@ class ReportController extends Controller
             ->orderBy('date', 'ASC')
             ->lists('amount', 'date');
 
-        $dataSales = $days->sales()
-            ->whereDate('created_at', '>=', $startDate->toDateString())
+        $dataSales = $days->sales()->whereDate('created_at', '>=', $startDate->toDateString())
             ->whereDate('created_at', '<=', $endDate->toDateString())
             ->groupBy('date')
             ->orderBy('date', 'ASC')
             ->lists('amount', 'date');
 
+        $salesOrders = Order::with('products')
+            ->sales()
+            ->whereDate('created_at', '>=', $startDate->toDateString())
+            ->whereDate('created_at', '<=', $endDate->toDateString())
+            ->get();
+
         $points = [];
 
         while ($endDate->diffInDays($startDate)) {
-            $endDate->subDays(1);
 
             $stocksTable->addRow([
                 $endDate->format('Y-m-d'),
@@ -58,9 +62,50 @@ class ReportController extends Controller
                 isset($dataSales[$endDate->format('Y-m-d')]) ? $dataSales[$endDate->format('Y-m-d')] : 0,
             ]);
 
+            $endDate->subDays(1);
         }
 
-        return $stocksTable->toJson();
+        $data = [
+            'dataTable'    => json_decode($stocksTable->toJson(), true),
+            'revenue'      => number_format($salesOrders->sum('subtotal')),
+            'transactions' => $salesOrders->count(),
+            'avgOrder'     => $this->getAverageOrder($salesOrders),
+            'productsSold' => $this->getProductsSoldQty($salesOrders)
+        ];
+
+        return $data;
+    }
+
+    /**
+     * Get average order
+     *
+     * @param $orders
+     * @return $avgOrder
+     */
+    public function getAverageOrder($orders)
+    {
+        $avgOrder = 0;
+
+        if ($orders->count()) {
+            $avgOrder = $orders->sum('subtotal') / $orders->count();
+        }
+
+        return number_format($avgOrder);
+    }
+
+    /**
+     * Get products sold quantity
+     *
+     * @param $orders
+     * @return $productsSold
+     */
+    public function getProductsSoldQty($orders)
+    {
+        $productsSold = $orders->sum(function($order) {
+            return $order->products->sum('pivot.qty');
+        });
+
+        return $productsSold;
     }
 
     /**
