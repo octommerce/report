@@ -1,0 +1,72 @@
+<?php if (!isset($topProducts)): ?>
+
+<p>No data</p>
+
+<?php else: ?>
+<div class="list-widget list-scrollable-container" id="Lists-relationStatusLogsViewList">
+    <div class="control-list list-scrollable" data-control="listwidget">
+        <table class="table data" data-control="rowlink">
+            <thead>
+                <tr>
+                    <th class="list-cell-type-text">
+                        <span>
+                            SKU
+                        </span>
+                    </th>
+                    <th class="list-cell-type-text">
+                        <span>
+                            Name
+                        </span>
+                    </th>
+                    <th class="list-cell-type-text">
+                        <span>
+                            Sales
+                        </span>
+                    </th>
+                    <th class="list-cell-type-text">
+                        <span>
+                            Average Price
+                        </span>
+                    </th>
+                    <th class="list-cell-type-text">
+                        <span>
+                            Revenue
+                        </span>
+                    </th>
+                    <th class="sort-desc active list-cell-type-text">
+                        <span>
+                            %
+                        </span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($topProducts as $product): ?>
+                <tr class="list-tree-level-0 rowlink">
+                    <td class="list-cell-type-text" data-title="">
+                        <?= $product['sku'] ?>
+                    </td>
+                    <td class="list-cell-type-text" data-title="">
+                        <?= $product['name'] ?>
+                    </td>
+                    <td class="list-cell-type-text" data-title="">
+                        <?= $product['qty'] ?>
+                    </td>
+                    <td class="list-cell-type-text" data-title="">
+                        <?= Currency::format($product['avg_price']) ?>
+                    </td>
+                    <td class="list-cell-type-text" data-title="">
+                        <?= Currency::format($product['revenue']) ?>
+                    </td>
+                    <td class="list-cell-type-text" data-title="">
+                        <?= number_format($product['percentage'], 2) ?>%
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+            <tfoot>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<?php endif ?>

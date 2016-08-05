@@ -1,48 +1,54 @@
-<form class="form-elements" role="form">
-    <div class="row">
-        <div class="col-md-6">
-            <h1>Report</h1>
-        </div>
-        <div class="col-md-3">
-            <div class="dropdown-field span-full">
-                <label>Date Range</label>
-                <select class="form-control custom-select" name="date_range">
-                    <option value='Last 7 days'>Last 7 days</option>
-                    <option value='Last 30 days' selected="selected">Last 30 days</option>
-                    <option value='This month'>This month</option>
-                    <option value='Last month'>Last month</option>
-                    <option value='This year'>This year</option>
-                    <option value='Custom'>Custom</option>
-                </select>
-            </div>
-        </div>
-        <div class="col-md-3 hide" data-trigger="[name=date_range]"
-            data-trigger-action="show"
-            data-trigger-condition="value[Custom]"
-            data-trigger-closest-parent="form">
-            <div class="form-group span-left" style="padding-bottom: 0">
-                <label>Start date</label>
-                <div class="field-datepicker" data-control="datepicker" data-disposable>
-                    <div class="input-with-icon right-align">
-                        <i class="icon icon-calendar-o"></i>
-                        <input type="text" name="" class="form-control align-right custom-date-range" autocomplete="off" data-datepicker>
+<div class="row">
+    <div class="col-md-6">
+        <h1>Report</h1>
+    </div>
+    <div class="col-md-6">
+        <div class="loading-indicator-container">
+            <form data-request="onLoad" data-request-success="loadReport(data)" data-request-update="products: '.report-products'" data-load-indicator="Generating report..." class="form-elements" id="report-form" role="form">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="dropdown-field span-full">
+                            <label>Date Range</label>
+                            <select class="form-control custom-select" name="date_range">
+                                <option value='Last 7 days'>Last 7 days</option>
+                                <option value='Last 30 days' selected="selected">Last 30 days</option>
+                                <option value='This month'>This month</option>
+                                <option value='Last month'>Last month</option>
+                                <option value='This year'>This year</option>
+                                <option value='Custom'>Custom</option>
+                            </select>
+                        </div>
                     </div>
-                    <input type="hidden" name="start_date" value="" data-datetime-value>
-                </div>
-            </div>
-            <div class="form-group span-right" style="padding-bottom: 0">
-                <label>End date</label>
-                <div class="field-datepicker" data-control="datepicker" data-disposable>
-                    <div class="input-with-icon right-align">
-                        <i class="icon icon-calendar-o"></i>
-                        <input type="text" class="form-control align-right custom-date-range" autocomplete="off" data-datepicker>
+                    <div class="col-md-6 hide" data-trigger="[name=date_range]"
+                        data-trigger-action="show"
+                        data-trigger-condition="value[Custom]"
+                        data-trigger-closest-parent="form">
+                        <div class="form-group span-left" style="padding-bottom: 0">
+                            <label>Start date</label>
+                            <div class="field-datepicker" data-control="datepicker" data-disposable>
+                                <div class="input-with-icon right-align">
+                                    <i class="icon icon-calendar-o"></i>
+                                    <input type="text" name="" class="form-control align-right custom-date-range" autocomplete="off" data-datepicker>
+                                </div>
+                                <input type="hidden" name="start_date" value="" data-datetime-value>
+                            </div>
+                        </div>
+                        <div class="form-group span-right" style="padding-bottom: 0">
+                            <label>End date</label>
+                            <div class="field-datepicker" data-control="datepicker" data-disposable>
+                                <div class="input-with-icon right-align">
+                                    <i class="icon icon-calendar-o"></i>
+                                    <input type="text" class="form-control align-right custom-date-range" autocomplete="off" data-datepicker>
+                                </div>
+                                <input type="hidden" name="end_date" value="" data-datetime-value>
+                            </div>
+                        </div>
                     </div>
-                    <input type="hidden" name="end_date" value="" data-datetime-value>
                 </div>
-            </div>
+            </form>
         </div>
     </div>
-</form>
+</div>
 
 <hr>
 
@@ -50,25 +56,25 @@
     <div class="scoreboard">
         <div class="scoreboard-item title-value">
             <h4>Revenue</h4>
-            <p id="summary-revenue" class="positive">IDR 30,392,200</p>
+            <p id="report-summary-revenue" class="positive"></p>
             <p class="description"></p>
         </div>
 
         <div  class="scoreboard-item title-value">
             <h4>Transactions</h4>
-            <p id="summary-transactions"class="oc-icon-shopping-cart">294</p>
+            <p id="report-summary-transactions"class="oc-icon-shopping-cart"></p>
             <p class="description"></p>
         </div>
 
         <div  class="scoreboard-item title-value">
             <h4>Avg. Order Value</h4>
-            <p id="summary-avg-order"class="positive">IDR 180,200</p>
+            <p id="report-summary-avgOrder"class="positive"></p>
             <p class="description"></p>
         </div>
 
         <div class="scoreboard-item title-value">
             <h4>Products Sold</h4>
-            <p id="summary-products-sold">10,021</p>
+            <p id="report-summary-productsSold"></p>
         </div>
 
         <div class="scoreboard-item pull-right">
@@ -116,8 +122,8 @@
         </li>
     </ul>
     <div class="tab-content">
-        <div class="tab-pane active">
-            Products
+        <div class="tab-pane active report-products">
+            <?= $this->makePartial('products') ?>
         </div>
         <div class="tab-pane">
             Categories

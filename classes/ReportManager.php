@@ -1,23 +1,31 @@
-<?php namespace Octommerce\Report\Http;
+<?php namespace Octommerce\Report\Classes;
 
 use Db;
 use Lava;
-use Input;
 use Carbon\Carbon;
-use Illuminate\Routing\Controller;
+use RainLab\User\Models\User;
 use Octommerce\Octommerce\Models\Order;
+use Octommerce\Octommerce\Models\Cart;
+use Octommerce\Octommerce\Models\City;
+use Octommerce\Octommerce\Models\Product;
+use Octommerce\Octommerce\Models\Brand;
+use Responsiv\Currency\Facades\Currency;
 
-class ReportController extends Controller
+
+class ReportManager
 {
+	use \October\Rain\Support\Traits\Singleton;
+
     /**
      * Get orders data
      *
      * @return $data
      */
-    public function getData()
+    public function getData($dateRange, $startDate = null, $endDate = null)
     {
         $isSales = false;
-        $date = $this->getStartAndEndDate(Input::get('date_range'));
+
+        $date = $this->getStartAndEndDate($dateRange, $startDate, $endDate);
         $startDate = Carbon::parse($date['start_date']);
         $endDate = Carbon::parse($date['end_date']);
 
@@ -67,10 +75,11 @@ class ReportController extends Controller
 
         $data = [
             'dataTable'    => json_decode($stocksTable->toJson(), true),
-            'revenue'      => number_format($salesOrders->sum('subtotal')),
+            'revenue'      => $salesOrders->sum('subtotal'),
             'transactions' => $salesOrders->count(),
             'avgOrder'     => $this->getAverageOrder($salesOrders),
-            'productsSold' => $this->getProductsSoldQty($salesOrders)
+            'productsSold' => $this->getProductsSoldQty($salesOrders),
+            'topProducts'  => $this->getTopProducts($salesOrders),
         ];
 
         return $data;
@@ -90,7 +99,7 @@ class ReportController extends Controller
             $avgOrder = $orders->sum('subtotal') / $orders->count();
         }
 
-        return number_format($avgOrder);
+        return $avgOrder;
     }
 
     /**
@@ -109,12 +118,58 @@ class ReportController extends Controller
     }
 
     /**
+     * Get top products
+     * @param  $orders
+     * @return Collection
+     */
+    public function getTopProducts($orders)
+    {
+        $products = collect();
+
+        $totalRevenue = 0;
+
+        foreach ($orders as $order) {
+            // dd($order->products()->get());
+            foreach ($order->products as $product) {
+
+                if (!isset($products[$product->id])) {
+                    $products[$product->id] = collect([
+                        'id' => $product->id,
+                        'name' => $product->name,
+                        'sku' => $product->sku,
+                        'qty' => 0,
+                        'sales' => 0,
+                        'revenue' => 0,
+                        'avg_price' => 0,
+                        'percentage' => 0,
+                    ]);
+                }
+
+                $products[$product->id]['qty'] += $product->pivot->qty;
+                $products[$product->id]['sales'] += 1;
+                $products[$product->id]['revenue'] += $product->pivot->qty * $product->pivot->price;
+
+                $totalRevenue += $product->pivot->qty * $product->pivot->price;
+            }
+        }
+
+        $products = $products->sortByDesc('revenue')->take(10)->map(function($product) use ($totalRevenue) {
+            $product['avg_price'] = $product['revenue'] / $product['sales'];
+            $product['percentage'] = $product['revenue'] / $totalRevenue * 100;
+
+            return $product;
+        });
+
+        return $products;
+    }
+
+    /**
      * Get start and end date
      *
      * @param $dataRange
      * @return $date
      **/
-    private function getStartAndEndDate($dateRange)
+    private function getStartAndEndDate($dateRange, $startDate, $endDate)
     {
         $startDate = '';
         $endDate = '';
@@ -141,17 +196,16 @@ class ReportController extends Controller
                 $endDate = new Carbon('last day of December ' . date('Y'));
                 break;
             case 'Custom':
-                $startDate = Carbon::parse(Input::get('start_date'));
-                $endDate = Carbon::parse(Input::get('end_date'))->addDays(1);
+                $startDate = $startDate;
+                $endDate = $endDate->addDays(1);
                 break;
         }
 
         $date = [
             'start_date' => $startDate,
             'end_date'   => $endDate
-        ]; 
+        ];
 
         return $date;
     }
-    
 }

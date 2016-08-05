@@ -7,13 +7,15 @@ use Carbon\Carbon;
 use Backend\Classes\Controller;
 use Octommerce\Octommerce\Models\Order;
 use Octommerce\Octommerce\Models\Product;
-use Octommerce\Octommerce\ReportWidgets\Summary as SummaryWidget;
+use Octommerce\Report\Classes\ReportManager;
+use Responsiv\Currency\Facades\Currency;
 
 /**
  * Reports Back-end Controller
  */
 class Reports extends Controller
 {
+    public $reportManager;
 
     public function __construct()
     {
@@ -21,19 +23,29 @@ class Reports extends Controller
 
         BackendMenu::setContext('Octommerce.Octommerce', 'commerce', 'reports');
 
-        $summaryWidget = new SummaryWidget($this);
-        $summaryWidget->alias = 'summary';
-        $summaryWidget->bindToController();
+        $this->reportManager = ReportManager::instance();
     }
 
     public function index()
     {
         $this->AddJs('/plugins/octommerce/report/assets/js/app.js');
 
-        // $this->vars['dataAllOrders'] = $this->getLastOrdersData(30, false);
-        // $this->vars['dataPaidOrders'] = $this->getLastOrdersData(30);
-
         $this->chart();
+    }
+
+    public function index_onLoad()
+    {
+        $data = $this->reportManager->getData(post('date_range'), post('start_date'), post('end_date'));
+
+        $this->vars['topProducts'] = $data['topProducts'];
+
+        return [
+            'dataTable'                    => $data['dataTable'],
+            '#report-summary-revenue'      => Currency::format($data['revenue']),
+            '#report-summary-transactions' => $data['transactions'],
+            '#report-summary-avgOrder'     => Currency::format($data['avgOrder']),
+            '#report-summary-productsSold' => $data['productsSold'],
+        ];
     }
 
     protected function chart()
@@ -47,44 +59,15 @@ class Reports extends Controller
                     ->addNumberColumn('Orders')
                     ->addNumberColumn('Sales');
 
-        $date = Carbon::now()->subDays($duration - 1);
-
-        // lists() does not accept raw queries,
-        // so you have to specify the SELECT clause
-        $days = Order::select(array(
-                Db::raw('DATE(`created_at`) as `date`'),
-                Db::raw('SUM(subtotal) as `amount`')
-            ));
-
-        $dataOrders = $days->where('created_at', '>', $date)
-            ->groupBy('date')
-            ->orderBy('date', 'ASC')
-            ->lists('amount', 'date');
-
-        $dataSales = $days->sales()
-            ->where('created_at', '>', $date)
-            ->groupBy('date')
-            ->orderBy('date', 'ASC')
-            ->lists('amount', 'date');
-
-        $points = [];
-
-        for ($i = $duration - 1; $i >= 0; $i--) {
-
-            $date = Carbon::now()->subDays($i);
-
-            $stocksTable->addRow([
-                $date->format('Y-m-d'),
-                isset($dataOrders[$date->format('Y-m-d')]) ? $dataOrders[$date->format('Y-m-d')] : 0,
-                isset($dataSales[$date->format('Y-m-d')]) ? $dataSales[$date->format('Y-m-d')] : 0,
-            ]);
-
-        }
+        $stocksTable->addRow([Carbon::now()->format('Y-m-d'), 0, 0]);
 
         $chart = Lava::AreaChart('MyStocks', $stocksTable, [
             'title' => 'Sales',
             'colors' => ['#ddd', 'green'],
-            ]);
+            'events' => [
+                'ready' => 'initReport'
+            ]
+        ]);
     }
 
     protected function getLastOrdersData($duration = 30, $isSales = true)
