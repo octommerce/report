@@ -1,6 +1,7 @@
 <?php namespace Octommerce\Report;
 
 use App;
+use Event;
 use Backend;
 use System\Classes\PluginBase;
 use Illuminate\Foundation\AliasLoader;
@@ -50,6 +51,17 @@ class Plugin extends PluginBase
         // Register alias
         $alias = AliasLoader::getInstance();
         $alias->alias('Lava', '\Khill\Lavacharts\Laravel\LavachartsFacade');
+
+        Event::listen('backend.menu.extendItems', function($manager) {
+            $manager->addSideMenuItems('Octommerce.Octommerce', 'commerce', [
+                'reports' => [
+                    'label'       => 'Report',
+                    'url'         => Backend::url('octommerce/report/reports'),
+                    'icon'        => 'icon-bar-chart',
+                    'permissions' => ['octommerce.report.*'],
+                ]
+            ]);
+        });
     }
 
     /**

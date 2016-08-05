@@ -1,8 +1,12 @@
 var reportLoaded = false;
 
+$(function() {
+	$('#report-form').hide();
+});
+
 function initReport() {
 	if (!reportLoaded) {
-		$('#report-form').submit();
+		$('#report-form').show().submit();
 
 		$('#report-form select[name="date_range"]').on('change', function() {
 	        if ($(this).val() != 'Custom') {
@@ -19,7 +23,7 @@ function initReport() {
 }
 
 function loadReport(data) {
-    lava.loadData('MyStocks', data.dataTable, function (chart) {
+    lava.loadData('orders', data.dataTable, function (chart) {
         // console.log(chart);
     });
 }
