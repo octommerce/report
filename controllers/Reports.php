@@ -38,6 +38,8 @@ class Reports extends Controller
         $data = $this->reportManager->getData(post('date_range'), post('start_date'), post('end_date'));
 
         $this->vars['topProducts'] = $data['topProducts'];
+        $this->vars['topCategories'] = $data['topCategories'];
+        $this->vars['topBrands'] = $data['topBrands'];
 
         return [
             'dataTable'                    => $data['dataTable'],

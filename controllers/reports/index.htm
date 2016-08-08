@@ -4,7 +4,11 @@
     </div>
     <div class="col-md-6">
         <div class="loading-indicator-container">
-            <form data-request="onLoad" data-request-success="loadReport(data)" data-request-update="products: '.report-products'" data-load-indicator="Generating report..." class="form-elements" id="report-form" role="form">
+            <form data-request="onLoad"
+                data-request-success="loadReport(data)" 
+                data-request-update="products: '.report-products', categories: '.report-categories', brands: '.report-brands'"
+                data-load-indicator="Generating report..."
+                class="form-elements" id="report-form" role="form">
                 <div class="row">
                     <div class="col-md-6">
                         <div class="dropdown-field span-full">
@@ -125,11 +129,11 @@
         <div class="tab-pane active report-products">
             <?= $this->makePartial('products') ?>
         </div>
-        <div class="tab-pane">
-            Categories
+        <div class="tab-pane report-categories">
+            <?= $this->makePartial('categories') ?>
         </div>
-        <div class="tab-pane">
-            Brands
+        <div class="tab-pane report-brands">
+            <?= $this->makePartial('brands') ?>
         </div>
         <div class="tab-pane">
             Payment Methods

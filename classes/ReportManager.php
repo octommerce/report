@@ -74,12 +74,14 @@ class ReportManager
         }
 
         $data = [
-            'dataTable'    => json_decode($stocksTable->toJson(), true),
-            'revenue'      => $salesOrders->sum('subtotal'),
-            'transactions' => $salesOrders->count(),
-            'avgOrder'     => $this->getAverageOrder($salesOrders),
-            'productsSold' => $this->getProductsSoldQty($salesOrders),
-            'topProducts'  => $this->getTopProducts($salesOrders),
+            'dataTable'     => json_decode($stocksTable->toJson(), true),
+            'revenue'       => $salesOrders->sum('subtotal'),
+            'transactions'  => $salesOrders->count(),
+            'avgOrder'      => $this->getAverageOrder($salesOrders),
+            'productsSold'  => $this->getProductsSoldQty($salesOrders),
+            'topProducts'   => $this->getTopProducts($salesOrders),
+            'topCategories' => $this->getTopCategories($salesOrders),
+            'topBrands'     => $this->getTopBrands($salesOrders),
         ];
 
         return $data;
@@ -161,6 +163,86 @@ class ReportManager
         });
 
         return $products;
+    }
+
+    /**
+     * Get top categories
+     * @param  $orders
+     * @return Collection
+     */
+    public function getTopCategories($orders)
+    {
+        $categories = collect();
+
+        $totalRevenue = 0;
+
+        foreach ($orders as $order) {
+            foreach ($order->products as $product) {
+                foreach($product->categories as $category) {
+                    if (!isset($categories[$category->id])) {
+                        $categories[$category->id] = collect([
+                            'id' => $category->id,
+                            'name' => $category->name,
+                            'sales' => 0,
+                            'revenue' => 0,
+                            'percentage' => 0,
+                        ]);
+                    }
+
+                    $categories[$category->id]['revenue'] += $product->pivot->qty * $product->pivot->price;
+                    $categories[$category->id]['sales'] += 1;
+                    $totalRevenue += $product->pivot->qty * $product->pivot->price;
+                }
+            }
+        }
+
+        $categories = $categories->sortByDesc('revenue')->take(10)->map(function($category) use ($totalRevenue) {
+            $category['percentage'] = $category['revenue'] / $totalRevenue * 100;
+
+            return $category;
+        });
+
+        return $categories;
+    }
+
+    /**
+     * Get top brands
+     * @param  $orders
+     * @return Collection
+     */
+    public function getTopBrands($orders)
+    {
+        $brands = collect();
+
+        $totalRevenue = 0;
+
+        foreach ($orders as $order) {
+            foreach ($order->products as $product) {
+
+                if (!isset($brands[$product->brand->id])) {
+                    $brands[$product->brand->id] = collect([
+                        'id' => $product->brand->id,
+                        'name' => $product->brand->name,
+                        'sales' => 0,
+                        'revenue' => 0,
+                        'percentage' => 0,
+                    ]);
+                }
+
+                $brands[$product->brand->id]['sales'] += 1;
+                $brands[$product->brand->id]['revenue'] += $product->pivot->qty * $product->pivot->price;
+
+                $totalRevenue += $product->pivot->qty * $product->pivot->price;
+            }
+        }
+
+        $brands = $brands->sortByDesc('revenue')->take(10)->map(function($brand) use ($totalRevenue) {
+            $brand['percentage'] = $brand['revenue'] / $totalRevenue * 100;
+
+            return $brand;
+        });
+
+        return $brands;
     }
 
     /**
