@@ -267,7 +267,7 @@ class ReportManager
                 break;
             case 'This month':
                 $startDate = new Carbon('first day of this month');
-                $endDate = new Carbon('last day of this month');
+                $endDate = Carbon::now();
                 break;
             case 'Last month':
                 $startDate = new Carbon('first day of last month');
@@ -275,7 +275,7 @@ class ReportManager
                 break;
             case 'This year':
                 $startDate = new Carbon('first day of January ' . date('Y'));
-                $endDate = new Carbon('last day of December ' . date('Y'));
+                $endDate = Carbon::now();
                 break;
             case 'Custom':
                 $startDate = $startDate;
