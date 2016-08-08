@@ -171,8 +171,8 @@ class ReportManager
      **/
     private function getStartAndEndDate($dateRange, $startDate, $endDate)
     {
-        $startDate = '';
-        $endDate = '';
+        $startDate = $startDate;
+        $endDate = $endDate;
 
         switch ($dateRange) {
             case 'Last 7 days':
@@ -197,8 +197,7 @@ class ReportManager
                 break;
             case 'Custom':
                 $startDate = $startDate;
-                $endDate = $endDate->addDays(1);
-                break;
+                $endDate = Carbon::parse($endDate)->addDays(1);
         }
 
         $date = [
