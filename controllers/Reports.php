@@ -30,6 +30,8 @@ class Reports extends Controller
     {
         $this->AddJs('/plugins/octommerce/report/assets/js/app.js');
 
+        $this->pageTitle = 'Report';
+
         $this->initChart();
     }
 
