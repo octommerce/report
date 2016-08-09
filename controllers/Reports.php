@@ -43,6 +43,7 @@ class Reports extends Controller
 
         return [
             'dataTable'                    => $data['dataTable'],
+            'dataTableCategories'          => $data['dataTableCategories'],
             '#report-summary-revenue'      => Currency::format($data['revenue']),
             '#report-summary-transactions' => $data['transactions'],
             '#report-summary-avgOrder'     => Currency::format($data['avgOrder']),
@@ -66,6 +67,27 @@ class Reports extends Controller
             'events' => [
                 'ready' => 'initReport'
             ]
+        ]);
+
+        $this->initBarChart();
+    }
+
+    protected function initBarChart()
+    {
+        $table = Lava::DataTable(); 
+
+        $table->addStringColumn('Categories')
+            ->addNumberColumn('Revenue');
+
+        $table->addRow(['', 0]);
+
+        $chart = Lava::BarChart('categories', $table, [
+            'events' => [
+                'ready' => 'initReport' 
+            ],
+            'legend' => [
+                'position' => 'bottom' 
+            ] 
         ]);
     }
 }

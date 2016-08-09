@@ -127,8 +127,12 @@
         <div class="tab-pane active report-products">
             <?= $this->makePartial('products') ?>
         </div>
-        <div class="tab-pane report-categories">
-            <?= $this->makePartial('categories') ?>
+        <div class="tab-pane">
+            <div id="categories-chart" class="col-md-5"></div>
+            <div class="report-categories col-md-7">
+                <?= $this->makePartial('categories') ?>
+            </div>
+            <?= Lava::render('BarChart', 'categories', 'categories-chart') ?>
         </div>
         <div class="tab-pane report-brands">
             <?= $this->makePartial('brands') ?>

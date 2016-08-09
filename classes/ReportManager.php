@@ -73,15 +73,18 @@ class ReportManager
             $endDate->subDays(1);
         }
 
+        $topCategories = $this->getTopCategories($salesOrders);
+
         $data = [
-            'dataTable'     => json_decode($stocksTable->toJson(), true),
-            'revenue'       => $salesOrders->sum('subtotal'),
-            'transactions'  => $salesOrders->count(),
-            'avgOrder'      => $this->getAverageOrder($salesOrders),
-            'productsSold'  => $this->getProductsSoldQty($salesOrders),
-            'topProducts'   => $this->getTopProducts($salesOrders),
-            'topCategories' => $this->getTopCategories($salesOrders),
-            'topBrands'     => $this->getTopBrands($salesOrders),
+            'dataTable'           => json_decode($stocksTable->toJson(), true),
+            'dataTableCategories' => json_decode($this->getDataTableForCategories($topCategories), true),
+            'revenue'             => $salesOrders->sum('subtotal'),
+            'transactions'        => $salesOrders->count(),
+            'avgOrder'            => $this->getAverageOrder($salesOrders),
+            'productsSold'        => $this->getProductsSoldQty($salesOrders),
+            'topProducts'         => $this->getTopProducts($salesOrders),
+            'topCategories'       => $topCategories,
+            'topBrands'           => $this->getTopBrands($salesOrders)
         ];
 
         return $data;
@@ -243,6 +246,28 @@ class ReportManager
         });
 
         return $brands;
+    }
+
+    /**
+     * Get dataTable for categories
+     *
+     * @return json
+     */
+    public function getDataTableForCategories($categories)
+    {
+        $table = Lava::DataTable(); 
+
+        $table->addStringColumn('Categories')
+            ->addNumberColumn('Revenue');
+
+        foreach ($categories as $category) {
+            $table->addRow([
+                $category['name'],
+                $category['revenue']
+            ]);
+        }
+
+        return $table->toJson();
     }
 
     /**
