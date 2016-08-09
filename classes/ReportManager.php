@@ -62,7 +62,7 @@ class ReportManager
 
         $points = [];
 
-        while ($endDate->diffInDays($startDate)) {
+        while ($startDate->diffInDays($endDate, false) >= 0) {
 
             $stocksTable->addRow([
                 $endDate->format('Y-m-d'),
@@ -258,24 +258,24 @@ class ReportManager
 
         switch ($dateRange) {
             case 'Last 7 days':
-                $startDate = Carbon::now()->subDays(7);
-                $endDate = Carbon::now();
+                $startDate = Carbon::today()->subDays(6);
+                $endDate = Carbon::today();
                 break;
             case 'Last 30 days':
-                $startDate = Carbon::now()->subDays(30);
-                $endDate = Carbon::now();
+                $startDate = Carbon::today()->subDays(29);
+                $endDate = Carbon::today();
                 break;
             case 'This month':
-                $startDate = new Carbon('first day of this month');
-                $endDate = Carbon::now();
+                $startDate = Carbon::today()->startOfMonth();
+                $endDate = Carbon::today();
                 break;
             case 'Last month':
                 $startDate = new Carbon('first day of last month');
                 $endDate = new Carbon('last day of last month');
                 break;
             case 'This year':
-                $startDate = new Carbon('first day of January ' . date('Y'));
-                $endDate = Carbon::now();
+                $startDate = Carbon::today()->startOfYear();
+                $endDate = Carbon::today();
                 break;
             case 'Custom':
                 $startDate = $startDate;
