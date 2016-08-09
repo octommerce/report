@@ -54,7 +54,7 @@ class ReportManager
             ->orderBy('date', 'ASC')
             ->lists('amount', 'date');
 
-        $salesOrders = Order::with('products')
+        $salesOrders = Order::with('products', 'products.brand', 'products.categories')
             ->sales()
             ->whereDate('created_at', '>=', $startDate->toDateString())
             ->whereDate('created_at', '<=', $endDate->toDateString())
