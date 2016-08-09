@@ -278,8 +278,8 @@ class ReportManager
                 $endDate = Carbon::today();
                 break;
             case 'Custom':
-                $startDate = $startDate;
-                $endDate = Carbon::parse($endDate)->addDays(1);
+                $startDate = Carbon::parse($startDate)->toDateString();
+                $endDate = Carbon::parse($endDate)->toDateString();
         }
 
         $date = [
