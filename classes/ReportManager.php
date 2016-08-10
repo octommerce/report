@@ -54,7 +54,7 @@ class ReportManager
             ->orderBy('date', 'ASC')
             ->lists('amount', 'date');
 
-        $salesOrders = Order::with('products', 'products.brand', 'products.categories')
+        $salesOrders = Order::with('products', 'products.brand', 'products.categories', 'invoices.payment_method', 'city')
             ->sales()
             ->whereDate('created_at', '>=', $startDate->toDateString())
             ->whereDate('created_at', '<=', $endDate->toDateString())
@@ -85,7 +85,8 @@ class ReportManager
             'topProducts'         => $this->getTopProducts($salesOrders),
             'topCategories'       => $topCategories,
             'topBrands'           => $this->getTopBrands($salesOrders),
-            'topPaymentMethods'   => $this->getPaymentMethods($salesOrders)
+            'topPaymentMethods'   => $this->getTopPaymentMethods($salesOrders),
+            'topLocations'        => $this->getTopLocations($salesOrders)
         ];
 
         return $data;
@@ -254,7 +255,7 @@ class ReportManager
      * @param  $orders
      * @return Collection
      */
-    public function getPaymentMethods($orders)
+    public function getTopPaymentMethods($orders)
     {
         $paymentMethods = collect();
 
@@ -287,6 +288,46 @@ class ReportManager
         });
 
         return $paymentMethods;
+    }
+
+    /**
+     * Get top locations
+     * @param  $orders
+     * @return Collection
+     */
+    public function getTopLocations($orders)
+    {
+        $locations = collect();
+
+        $totalRevenue = 0;
+
+        foreach ($orders as $order) {
+
+            if (! $order->city_id) continue;
+
+            if (!isset($locations[$order->city_id])) {
+                $locations[$order->city_id] = collect([
+                    'id' => $order->city_id,
+                    'name' => $order->city->name,
+                    'sales' => 0,
+                    'revenue' => 0,
+                    'percentage' => 0,
+                ]);
+            }
+
+            $locations[$order->city_id]['sales'] += 1;
+            $locations[$order->city_id]['revenue'] += $order->total;
+
+            $totalRevenue += $order->total;
+        }
+
+        $locations = $locations->sortByDesc('revenue')->take(10)->map(function($location) use ($totalRevenue) {
+            $location['percentage'] = $location['revenue'] / $totalRevenue * 100;
+
+            return $location;
+        });
+
+        return $locations;
     }
 
     /**

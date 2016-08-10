@@ -7,7 +7,7 @@
             <form data-request="onLoad"
                 data-request-success="loadReport(data)" 
                 data-request-update="products: '.report-products', categories: '.report-categories', brands: '.report-brands', 
-                payment_methods: '.report-payment-methods'"
+                payment_methods: '.report-payment-methods', locations: '.report-locations'"
                 data-load-indicator="Generating report..."
                 class="form-elements" id="report-form" role="form">
                 <div class="row">
@@ -141,8 +141,8 @@
         <div class="tab-pane report-payment-methods">
             <?= $this->makePartial('payment_methods') ?>
         </div>
-        <div class="tab-pane">
-            Locations
+        <div class="tab-pane report-locations">
+            <?= $this->makePartial('locations') ?>
         </div>
     </div>
 </div>
