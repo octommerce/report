@@ -42,6 +42,7 @@ class Reports extends Controller
         $this->vars['topProducts'] = $data['topProducts'];
         $this->vars['topCategories'] = $data['topCategories'];
         $this->vars['topBrands'] = $data['topBrands'];
+        $this->vars['topPaymentMethods'] = $data['topPaymentMethods'];
 
         return [
             'dataTable'                    => $data['dataTable'],

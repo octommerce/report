@@ -1,0 +1,56 @@
+<?php if (!isset($topPaymentMethods)): ?>
+
+<p>No data</p>
+
+<?php else: ?>
+<div class="list-widget list-scrollable-container" id="Lists-relationStatusLogsViewList">
+    <div class="control-list list-scrollable" data-control="listwidget">
+        <table class="table data" data-control="rowlink">
+            <thead>
+                <tr>
+                    <th class="list-cell-type-text">
+                        <span>
+                            Name
+                        </span>
+                    </th>
+                    <th class="list-cell-type-text">
+                        <span>
+                            Sales
+                        </span>
+                    </th>
+                    <th class="list-cell-type-text">
+                        <span>
+                            Revenue
+                        </span>
+                    </th>
+                    <th class="sort-desc active list-cell-type-text">
+                        <span>
+                            %
+                        </span>
+                    </th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php foreach ($topPaymentMethods as $paymentMethod): ?>
+                <tr class="list-tree-level-0 rowlink">
+                    <td class="list-cell-type-text" data-title="">
+                        <?= $paymentMethod['name'] ?>
+                    </td>
+                    <td class="list-cell-type-text" data-title="">
+                        <?= $paymentMethod['sales'] ?>
+                    </td>
+                    <td class="list-cell-type-text" data-title="">
+                        <?= Currency::format($paymentMethod['revenue']) ?>
+                    </td>
+                    <td class="list-cell-type-text" data-title="">
+                        <?= number_format($paymentMethod['percentage'], 2) ?>%
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+            <tfoot>
+            </tfoot>
+        </table>
+    </div>
+</div>
+<?php endif ?>

@@ -84,7 +84,8 @@ class ReportManager
             'productsSold'        => $this->getProductsSoldQty($salesOrders),
             'topProducts'         => $this->getTopProducts($salesOrders),
             'topCategories'       => $topCategories,
-            'topBrands'           => $this->getTopBrands($salesOrders)
+            'topBrands'           => $this->getTopBrands($salesOrders),
+            'topPaymentMethods'   => $this->getPaymentMethods($salesOrders)
         ];
 
         return $data;
@@ -246,6 +247,46 @@ class ReportManager
         });
 
         return $brands;
+    }
+
+    /**
+     * Get top payment methods
+     * @param  $orders
+     * @return Collection
+     */
+    public function getPaymentMethods($orders)
+    {
+        $paymentMethods = collect();
+
+        $totalRevenue = 0;
+
+        foreach ($orders as $order) {
+            foreach ($order->invoices as $invoice) {
+
+                if (!isset($paymentMethods[$invoice->payment_method_id])) {
+                    $paymentMethods[$invoice->payment_method_id] = collect([
+                        'id' => $invoice->payment_method_id,
+                        'name' => $invoice->payment_method->name,
+                        'sales' => 0,
+                        'revenue' => 0,
+                        'percentage' => 0,
+                    ]);
+                }
+
+                $paymentMethods[$invoice->payment_method_id]['sales'] += 1;
+                $paymentMethods[$invoice->payment_method_id]['revenue'] += $invoice->total;
+
+                $totalRevenue += $invoice->total;
+            }
+        }
+
+        $paymentMethods = $paymentMethods->sortByDesc('revenue')->take(10)->map(function($paymentMethod) use ($totalRevenue) {
+            $paymentMethod['percentage'] = $paymentMethod['revenue'] / $totalRevenue * 100;
+
+            return $paymentMethod;
+        });
+
+        return $paymentMethods;
     }
 
     /**
