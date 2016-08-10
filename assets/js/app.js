@@ -26,7 +26,4 @@ function loadReport(data) {
     lava.loadData('orders', data.dataTable, function (chart) {
         // console.log(chart);
     });
-    lava.loadData('categories', data.dataTableCategories, function (chart) {
-        // console.log(chart);
-    });
 }
