@@ -55,6 +55,15 @@ class Reports extends Controller
         ];
     }
 
+    public function index_onLoadByInterval()
+    {
+        $data = $this->reportManager->getDataByInterval(post('date_range'), post('start_date'), post('end_date'), post('interval'));
+
+        return [
+            'dataTable' => $data['dataTable'] 
+        ];
+    }
+
     protected function initChart()
     {
         $table = Lava::DataTable();

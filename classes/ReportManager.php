@@ -93,6 +93,133 @@ class ReportManager
     }
 
     /**
+     * Get orders data by interval
+     *
+     * @return $data
+     */
+    public function getDataByInterval($dateRange, $startDate = null, $endDate = null, $interval)
+    {
+        $isSales = false;
+
+        $date = $this->getStartAndEndDate($dateRange, $startDate, $endDate);
+        $startDate = Carbon::parse($date['start_date']);
+        $endDate = Carbon::parse($date['end_date']);
+
+        $stocksTable = Lava::DataTable();
+
+        $stocksTable->addStringColumn('Date')
+                    ->addNumberColumn('Orders')
+                    ->addNumberColumn('Sales');
+
+        // lists() does not accept raw queries,
+        // so you have to specify the SELECT clause
+        $days = Order::select(array(
+                Db::raw('TIMESTAMP(`created_at`) as `date`'),
+                Db::raw('SUM(subtotal) as `amount`')
+            ));
+
+        $dataOrders = $days->whereDate('created_at', '>=', $startDate->toDateString())
+            ->whereDate('created_at', '<=', $endDate->toDateString())
+            ->groupBy(Db::raw($this->getGroupByRawFormat($interval)))
+            ->orderBy(Db::raw($this->getOrderByRawFormat($interval)), 'ASC')
+            ->lists('amount', 'date');
+
+        $dataSales = $days->sales()->whereDate('created_at', '>=', $startDate->toDateString())
+            ->whereDate('created_at', '<=', $endDate->toDateString())
+            ->groupBy(Db::raw($this->getGroupByRawFormat($interval)))
+            ->orderBy(Db::raw($this->getOrderByRawFormat($interval)), 'ASC')
+            ->lists('amount', 'date');
+
+        $points = [];
+
+        $dataOrdersValues = array_values($dataOrders);
+
+        foreach ($dataSales as $date => $amount) {
+            
+            $dateFormated = $this->getFormatDateBasedInterval($date, $interval);
+            $orderAmount = array_shift($dataOrdersValues);
+
+            $stocksTable->addRow([
+                $dateFormated,
+                $orderAmount ? $orderAmount : 0,
+                $amount
+            ]);
+        }
+
+        $data = [
+            'dataTable'           => json_decode($stocksTable->toJson(), true),
+        ];
+
+        return $data;
+    }
+
+    public function getGroupByRawFormat($interval)
+    {
+        $rawFormat = '';
+
+        switch($interval) {
+            case 'month':
+                $rawFormat = 'MONTH(date)';
+                break; 
+            case 'week':
+                $rawFormat = 'WEEKOFYEAR(date)';
+                break; 
+            case 'day':
+                $rawFormat = 'DAYNAME(date)';
+                break; 
+            case 'time':
+                $rawFormat = 'HOUR(date)';
+                break; 
+        }
+
+        return $rawFormat;
+    }
+
+    public function getOrderByRawFormat($interval)
+    {
+        $rawFormat = '';
+
+        switch($interval) {
+            case 'month':
+                $rawFormat = 'MONTH(date)';
+                break; 
+            case 'week':
+                $rawFormat = 'WEEKOFYEAR(date)';
+                break; 
+            case 'day':
+                $rawFormat = 'DAYOFWEEK(date)';
+                break; 
+            case 'time':
+                $rawFormat = 'HOUR(date)';
+                break; 
+        }
+
+        return $rawFormat;
+    }
+
+    public function getFormatDateBasedInterval($date, $interval)
+    {
+        $dateFormated = '';
+
+        switch($interval) {
+            case 'month':
+                $dateFormated = Carbon::parse($date)->format('M');
+                break; 
+            case 'week':
+                $dateFormated = Carbon::parse($date)->format('W');
+                break; 
+            case 'day':
+                $dateFormated = Carbon::parse($date)->format('l');
+                break; 
+            case 'time':
+                $dateFormated = Carbon::parse($date)->format('H');
+                break; 
+        }
+
+        return $dateFormated;
+    }
+
+    /**
      * Get average order
      *
      * @param $orders
