@@ -144,3 +144,14 @@
         </div>
     </div>
 </div>
+
+{% put scripts %}
+<script>
+$("#report-form-interval .btn-default").click(function(){
+    var 
+    elements = $("#report-form-interval .btn-default");
+    elements.removeClass("active");
+    $(this).addClass("active");
+}); 
+</script>
+{% endput %}
