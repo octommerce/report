@@ -49,3 +49,4 @@ function loadReport(data) {
         // console.log(chart);
     });
 }
+

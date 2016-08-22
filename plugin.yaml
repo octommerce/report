@@ -1,0 +1,9 @@
+plugin:
+    name: 'Octommerce Report'
+    description: 'Report extension for Octommerce.'
+    icon: icon-bar-chart
+    homepage: ''
+permissions:
+    octommerce.report.access_reports:
+        tab: Commerce
+        label: 'Access Reports'
