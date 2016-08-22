@@ -107,9 +107,16 @@ class ReportManager
 
         $stocksTable = Lava::DataTable();
 
-        $stocksTable->addStringColumn('Date')
-                    ->addNumberColumn('Orders')
-                    ->addNumberColumn('Sales');
+        if ($interval == 'date') {
+            $stocksTable->addDateColumn('Date')
+                        ->addNumberColumn('Orders')
+                        ->addNumberColumn('Sales');
+        }
+        else {
+            $stocksTable->addStringColumn('Date')
+                        ->addNumberColumn('Orders')
+                        ->addNumberColumn('Sales');
+        }
 
         // lists() does not accept raw queries,
         // so you have to specify the SELECT clause
@@ -158,6 +165,9 @@ class ReportManager
         $rawFormat = '';
 
         switch($interval) {
+            case 'date':
+                $rawFormat = 'DATE(date)';
+                break; 
             case 'month':
                 $rawFormat = 'MONTH(date)';
                 break; 
@@ -180,6 +190,9 @@ class ReportManager
         $rawFormat = '';
 
         switch($interval) {
+            case 'date':
+                $rawFormat = 'DATE(date)';
+                break; 
             case 'month':
                 $rawFormat = 'MONTH(date)';
                 break; 
@@ -202,6 +215,9 @@ class ReportManager
         $dateFormated = '';
 
         switch($interval) {
+            case 'date':
+                $dateFormated = Carbon::parse($date)->format('M d, Y');
+                break; 
             case 'month':
                 $dateFormated = Carbon::parse($date)->format('M');
                 break; 
@@ -430,7 +446,7 @@ class ReportManager
 
         foreach ($orders as $order) {
 
-            if (! $order->city_id) continue;
+            if (! $order->city) continue;
 
             if (!isset($locations[$order->city_id])) {
                 $locations[$order->city_id] = collect([

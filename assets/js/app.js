@@ -35,6 +35,13 @@ $(document).ready(function() {
             }
         });
     });
+
+    $("#report-form-interval .btn-default").click(function(){
+        var 
+        elements = $("#report-form-interval .btn-default");
+        elements.removeClass("active");
+        $(this).addClass("active");
+    }); 
 });
 
 function loadReport(data) {
@@ -42,3 +49,4 @@ function loadReport(data) {
         // console.log(chart);
     });
 }
+
