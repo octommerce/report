@@ -97,7 +97,7 @@ class ReportManager
      *
      * @return $data
      */
-    public function getDataByInterval($dateRange, $startDate = null, $endDate = null, $interval)
+    public function getDataByInterval($dateRange, $startDate = null, $endDate = null, $interval, $type)
     {
         $isSales = false;
 
@@ -118,11 +118,12 @@ class ReportManager
                         ->addNumberColumn('Sales');
         }
 
+        $amountRaw = $type == 'revenue' ? 'SUM(subtotal)' : 'COUNT(*)';
         // lists() does not accept raw queries,
         // so you have to specify the SELECT clause
         $days = Order::select(array(
                 Db::raw('TIMESTAMP(`created_at`) as `date`'),
-                Db::raw('SUM(subtotal) as `amount`')
+                Db::raw($amountRaw . ' as `amount`')
             ));
 
         $dataOrders = $days->whereDate('created_at', '>=', $startDate->toDateString())

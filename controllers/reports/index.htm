@@ -80,8 +80,19 @@
             <p id="report-summary-productsSold"></p>
         </div>
 
-        <form class="form-elements" id="report-form-interval" role="form">
         <div class="scoreboard-item pull-right">
+            <form class="form-elements" id="report-form-type" role="form">
+            <div class="btn-group" data-toggle="buttons">
+                <label class="btn btn-default">
+                    <input type="radio" name="type" value="transaction" id="" autocomplete="off"> Transaction
+                </label>
+                <label class="btn btn-default active">
+                    <input type="radio" name="type" value="revenue" id="" autocomplete="off"> Revenue
+                </label>
+            </div>
+            </form>
+
+            <form class="form-elements" id="report-form-interval" role="form">
             <div class="btn-group" data-toggle="buttons">
                 <label class="btn btn-default active">
                     <input type="radio" name="interval" value="date" id="" autocomplete="off"> Date

@@ -57,7 +57,7 @@ class Reports extends Controller
 
     public function index_onLoadByInterval()
     {
-        $data = $this->reportManager->getDataByInterval(post('date_range'), post('start_date'), post('end_date'), post('interval'));
+        $data = $this->reportManager->getDataByInterval(post('date_range'), post('start_date'), post('end_date'), post('interval'), post('type'));
 
         return [
             'dataTable' => $data['dataTable'] 
