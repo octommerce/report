@@ -29,6 +29,7 @@ class Reports extends Controller
     public function index()
     {
         $this->AddJs('/plugins/octommerce/report/assets/js/app.js');
+        $this->AddCSS('/plugins/octommerce/report/assets/css/app.css');
 
         $this->pageTitle = 'Report';
 
