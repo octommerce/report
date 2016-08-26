@@ -38,6 +38,7 @@ class ReportManager
         // lists() does not accept raw queries,
         // so you have to specify the SELECT clause
         $days = Order::select(array(
+                Db::raw('TIMESTAMP(`created_at`) as `timestamp`'),
                 Db::raw('DATE(`created_at`) as `date`'),
                 Db::raw('SUM(subtotal) as `amount`')
             ));
@@ -46,13 +47,13 @@ class ReportManager
             ->whereDate('created_at', '<=', $endDate->toDateString())
             ->groupBy('date')
             ->orderBy('date', 'ASC')
-            ->lists('amount', 'date');
+            ->get();
 
         $dataSales = $days->sales()->whereDate('created_at', '>=', $startDate->toDateString())
             ->whereDate('created_at', '<=', $endDate->toDateString())
             ->groupBy('date')
             ->orderBy('date', 'ASC')
-            ->lists('amount', 'date');
+            ->get();
 
         $salesOrders = Order::with('products', 'products.brand', 'products.categories', 'invoices.payment_method', 'city')
             ->sales()
@@ -62,15 +63,29 @@ class ReportManager
 
         $points = [];
 
-        while ($startDate->diffInDays($endDate, false) >= 0) {
+        if ($dataSales->count() >= $dataOrders->count()) {
+            foreach ($dataSales as $dataSale) {
 
-            $stocksTable->addRow([
-                $endDate->format('Y-m-d'),
-                isset($dataOrders[$endDate->format('Y-m-d')]) ? $dataOrders[$endDate->format('Y-m-d')] : 0,
-                isset($dataSales[$endDate->format('Y-m-d')]) ? $dataSales[$endDate->format('Y-m-d')] : 0,
-            ]);
+                $dateFormated = $this->getFormatDateBasedInterval($dataSale->timestamp, 'date');
 
-            $endDate->subDays(1);
+                $stocksTable->addRow([
+                    $dateFormated,
+                    $this->getAmountValue($dataOrders, $dataSale->date),
+                    $dataSale->amount
+                ]);
+            }
+        }
+        else {
+            foreach ($dataOrders as $dataOrder) {
+
+                $dateFormated = $this->getFormatDateBasedInterval($dataOrder->timestamp, 'date');
+
+                $stocksTable->addRow([
+                    $dateFormated,
+                    $dataOrder->amount,
+                    $this->getAmountValue($dataSales, $dataOrder->date)
+                ]);
+            }
         }
 
         $topCategories = $this->getTopCategories($salesOrders);
@@ -119,39 +134,54 @@ class ReportManager
         }
 
         $amountRaw = $type == 'revenue' ? 'SUM(subtotal)' : 'COUNT(*)';
+        $dateRaw = $this->getSelectRawFormat($interval);
         // lists() does not accept raw queries,
         // so you have to specify the SELECT clause
         $days = Order::select(array(
-                Db::raw('TIMESTAMP(`created_at`) as `date`'),
+                Db::raw('TIMESTAMP(created_at) as `timestamp`'),
+                Db::raw($dateRaw . ' as `date`'),
                 Db::raw($amountRaw . ' as `amount`')
             ));
 
         $dataOrders = $days->whereDate('created_at', '>=', $startDate->toDateString())
             ->whereDate('created_at', '<=', $endDate->toDateString())
-            ->groupBy(Db::raw($this->getGroupByRawFormat($interval)))
+            ->groupBy('date')
             ->orderBy(Db::raw($this->getOrderByRawFormat($interval)), 'ASC')
-            ->lists('amount', 'date');
+            ->get();
 
         $dataSales = $days->sales()->whereDate('created_at', '>=', $startDate->toDateString())
             ->whereDate('created_at', '<=', $endDate->toDateString())
-            ->groupBy(Db::raw($this->getGroupByRawFormat($interval)))
+            ->groupBy('date')
             ->orderBy(Db::raw($this->getOrderByRawFormat($interval)), 'ASC')
-            ->lists('amount', 'date');
+            ->get();
 
         $points = [];
 
-        $dataOrdersValues = array_values($dataOrders);
+        if ($dataSales->count() >= $dataOrders->count()) {
+            trace_log($dataSales->count());
+            foreach ($dataSales as $dataSale) {
 
-        foreach ($dataSales as $date => $amount) {
-            
-            $dateFormated = $this->getFormatDateBasedInterval($date, $interval);
-            $orderAmount = array_shift($dataOrdersValues);
+                $dateFormated = $this->getFormatDateBasedInterval($dataSale->timestamp, $interval);
+                trace_log('sales ' . $dateFormated);
 
-            $stocksTable->addRow([
-                $dateFormated,
-                $orderAmount ? $orderAmount : 0,
-                $amount
-            ]);
+                $stocksTable->addRow([
+                    $dateFormated,
+                    $this->getAmountValue($dataOrders, $dataSale->date),
+                    $dataSale->amount
+                ]);
+            }
+        }
+        else {
+            foreach ($dataOrders as $dataOrder) {
+
+                $dateFormated = $this->getFormatDateBasedInterval($dataOrder->timestamp, $interval);
+
+                $stocksTable->addRow([
+                    $dateFormated,
+                    $dataOrder->amount,
+                    $this->getAmountValue($dataSales, $dataOrder->date)
+                ]);
+            }
         }
 
         $data = [
@@ -159,6 +189,35 @@ class ReportManager
         ];
 
         return $data;
+    }
+
+    /**
+     * Get amount value in collection
+     *
+     * @param  $collection
+     * @param  $date
+     * 
+     * @return $amount
+     **/
+    public function getAmountValue($collection, $date) 
+    {
+        $data = $collection->first(function($key, $value) use ($date) {
+            return $value['date'] == $date; 
+        }); 
+
+        if (! $data) {
+            return 0; 
+        }
+
+        return $data->amount;
+    }
+
+    public function getSelectRawFormat($interval) 
+    {
+        $format = $this->getGroupByRawFormat($interval);
+        $format = str_replace('(date)', '(created_at)', $format);
+
+        return $format;
     }
 
     public function getGroupByRawFormat($interval)
@@ -192,19 +251,19 @@ class ReportManager
 
         switch($interval) {
             case 'date':
-                $rawFormat = 'DATE(date)';
+                $rawFormat = 'DATE(created_at)';
                 break; 
             case 'month':
-                $rawFormat = 'MONTH(date)';
+                $rawFormat = 'MONTH(created_at)';
                 break; 
             case 'week':
-                $rawFormat = 'WEEKOFYEAR(date)';
+                $rawFormat = 'WEEKOFYEAR(created_at)';
                 break; 
             case 'day':
-                $rawFormat = 'DAYOFWEEK(date)';
+                $rawFormat = 'DAYOFWEEK(created_at)';
                 break; 
             case 'time':
-                $rawFormat = 'HOUR(date)';
+                $rawFormat = 'HOUR(created_at)';
                 break; 
         }
 
