@@ -158,11 +158,9 @@ class ReportManager
         $points = [];
 
         if ($dataSales->count() >= $dataOrders->count()) {
-            trace_log($dataSales->count());
             foreach ($dataSales as $dataSale) {
 
                 $dateFormated = $this->getFormatDateBasedInterval($dataSale->timestamp, $interval);
-                trace_log('sales ' . $dateFormated);
 
                 $stocksTable->addRow([
                     $dateFormated,
