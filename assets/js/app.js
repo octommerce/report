@@ -23,6 +23,13 @@ function initReport() {
 }
 
 $(document).ready(function() {
+    $('#report-form').submit(function() {
+        $(this).data('request-data', {
+            interval: $('#report-form-interval .active input:radio[name="interval"]').val(),
+            type: $('#report-form-type .active input:radio[name="type"]').val()
+        });
+    });
+
     $('#report-form-interval input:radio[name="interval"]').on('change', function() {
         $('#report-form-interval').request('onLoadByFilter', {
             data: {
