@@ -38,7 +38,7 @@ class Reports extends Controller
 
     public function index_onLoad()
     {
-        $data = $this->reportManager->getData(post('date_range'), post('start_date'), post('end_date'));
+        $data = $this->reportManager->getData(post());
 
         $this->vars['topProducts'] = $data['topProducts'];
         $this->vars['topCategories'] = $data['topCategories'];
@@ -56,12 +56,12 @@ class Reports extends Controller
         ];
     }
 
-    public function index_onLoadByInterval()
+    public function index_onLoadByFilter()
     {
-        $data = $this->reportManager->getDataByInterval(post('date_range'), post('start_date'), post('end_date'), post('interval'), post('type'));
+        $stocksTable = $this->reportManager->getDataTable(post());
 
         return [
-            'dataTable' => $data['dataTable'] 
+            'dataTable' => json_decode($stocksTable->toJson(), true)
         ];
     }
 

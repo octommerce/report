@@ -24,7 +24,7 @@ function initReport() {
 
 $(document).ready(function() {
     $('#report-form-interval input:radio[name="interval"]').on('change', function() {
-        $('#report-form-interval').request('onLoadByInterval', {
+        $('#report-form-interval').request('onLoadByFilter', {
             data: {
                 date_range: $('#report-form select[name="date_range"]').val(),
                 start_date: $('#report-form input[name="start_date"]').val(),
@@ -38,7 +38,7 @@ $(document).ready(function() {
     });
 
     $('#report-form-type input:radio[name="type"]').on('change', function() {
-        $('#report-form-type').request('onLoadByInterval', {
+        $('#report-form-type').request('onLoadByFilter', {
             data: {
                 date_range: $('#report-form select[name="date_range"]').val(),
                 start_date: $('#report-form input[name="start_date"]').val(),

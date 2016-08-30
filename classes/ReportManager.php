@@ -18,42 +18,15 @@ class ReportManager
 
     /**
      * Get orders data
-     *
+     * 
+     * @param $data
      * @return $data
      */
-    public function getData($dateRange, $startDate = null, $endDate = null)
+    public function getData($data)
     {
-        $isSales = false;
-
-        $date = $this->getStartAndEndDate($dateRange, $startDate, $endDate);
+        $date = $this->getStartAndEndDate($data['date_range'], $data['start_date'], $data['end_date']);
         $startDate = Carbon::parse($date['start_date']);
         $endDate = Carbon::parse($date['end_date']);
-
-        $stocksTable = Lava::DataTable();
-
-        $stocksTable->addDateColumn('Date')
-                    ->addNumberColumn('Orders')
-                    ->addNumberColumn('Sales');
-
-        // lists() does not accept raw queries,
-        // so you have to specify the SELECT clause
-        $days = Order::select(array(
-                Db::raw('TIMESTAMP(`created_at`) as `timestamp`'),
-                Db::raw('DATE(`created_at`) as `date`'),
-                Db::raw('SUM(subtotal) as `amount`')
-            ));
-
-        $dataOrders = $days->whereDate('created_at', '>=', $startDate->toDateString())
-            ->whereDate('created_at', '<=', $endDate->toDateString())
-            ->groupBy('date')
-            ->orderBy('date', 'ASC')
-            ->get();
-
-        $dataSales = $days->sales()->whereDate('created_at', '>=', $startDate->toDateString())
-            ->whereDate('created_at', '<=', $endDate->toDateString())
-            ->groupBy('date')
-            ->orderBy('date', 'ASC')
-            ->get();
 
         $salesOrders = Order::with('products', 'products.brand', 'products.categories', 'invoices.payment_method', 'city')
             ->sales()
@@ -61,33 +34,7 @@ class ReportManager
             ->whereDate('created_at', '<=', $endDate->toDateString())
             ->get();
 
-        $points = [];
-
-        if ($dataSales->count() >= $dataOrders->count()) {
-            foreach ($dataSales as $dataSale) {
-
-                $dateFormated = $this->getFormatDateBasedInterval($dataSale->timestamp, 'date');
-
-                $stocksTable->addRow([
-                    $dateFormated,
-                    $this->getAmountValue($dataOrders, $dataSale->date),
-                    $dataSale->amount
-                ]);
-            }
-        }
-        else {
-            foreach ($dataOrders as $dataOrder) {
-
-                $dateFormated = $this->getFormatDateBasedInterval($dataOrder->timestamp, 'date');
-
-                $stocksTable->addRow([
-                    $dateFormated,
-                    $dataOrder->amount,
-                    $this->getAmountValue($dataSales, $dataOrder->date)
-                ]);
-            }
-        }
-
+        $stocksTable = $this->getDataTable($data);
         $topCategories = $this->getTopCategories($salesOrders);
 
         $data = [
@@ -108,15 +55,19 @@ class ReportManager
     }
 
     /**
-     * Get orders data by interval
-     *
-     * @return $data
+     * Get data table
+     * 
+     * @param $data
+     * @return $stocksTable
      */
-    public function getDataByInterval($dateRange, $startDate = null, $endDate = null, $interval, $type)
+    public function getDataTable($data)
     {
         $isSales = false;
 
-        $date = $this->getStartAndEndDate($dateRange, $startDate, $endDate);
+        $type = isset($data['type']) ? $data['type'] : 'revenue';
+        $interval = isset($data['interval']) ? $data['interval'] : 'date';
+
+        $date = $this->getStartAndEndDate($data['date_range'], $data['start_date'], $data['end_date']);
         $startDate = Carbon::parse($date['start_date']);
         $endDate = Carbon::parse($date['end_date']);
 
@@ -182,11 +133,7 @@ class ReportManager
             }
         }
 
-        $data = [
-            'dataTable'           => json_decode($stocksTable->toJson(), true),
-        ];
-
-        return $data;
+        return $stocksTable;
     }
 
     /**
@@ -559,7 +506,7 @@ class ReportManager
      * @param $dataRange
      * @return $date
      **/
-    private function getStartAndEndDate($dateRange, $startDate, $endDate)
+    private function getStartAndEndDate($dateRange, $startDate = null, $endDate = null)
     {
         $startDate = $startDate;
         $endDate = $endDate;
