@@ -28,7 +28,7 @@ $(document).ready(function() {
             data: {
                 date_range: $('#report-form select[name="date_range"]').val(),
                 start_date: $('#report-form input[name="start_date"]').val(),
-                end_range: $('#report-form input[name="end_date"]').val(),
+                end_date: $('#report-form input[name="end_date"]').val(),
                 type: $('#report-form-type .active input:radio[name="type"]').val()
             },
             success: function(data) {
@@ -42,7 +42,7 @@ $(document).ready(function() {
             data: {
                 date_range: $('#report-form select[name="date_range"]').val(),
                 start_date: $('#report-form input[name="start_date"]').val(),
-                end_range: $('#report-form input[name="end_date"]').val(),
+                end_date: $('#report-form input[name="end_date"]').val(),
                 interval: $('#report-form-interval .active input:radio[name="interval"]').val()
             },
             success: function(data) {
