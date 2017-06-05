@@ -22,10 +22,12 @@ class Plugin extends PluginBase
     {
         // Service provider
         App::register('\Khill\Lavacharts\Laravel\LavachartsServiceProvider');
+        App::register('\Maatwebsite\Excel\ExcelServiceProvider');
 
         // Register alias
         $alias = AliasLoader::getInstance();
         $alias->alias('Lava', '\Khill\Lavacharts\Laravel\LavachartsFacade');
+        $alias->alias('Excel', '\Maatwebsite\Excel\Facades\Excel');
 
         Event::listen('backend.menu.extendItems', function($manager) {
             $manager->addSideMenuItems('Octommerce.Octommerce', 'commerce', [

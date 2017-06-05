@@ -2,6 +2,7 @@
 
 use Db;
 use Lava;
+use Redirect;
 use BackendMenu;
 use Carbon\Carbon;
 use Backend\Classes\Controller;
@@ -54,6 +55,11 @@ class Reports extends Controller
             '#report-summary-avgOrder'     => Currency::format($data['avgOrder']),
             '#report-summary-productsSold' => $data['productsSold'],
         ];
+    }
+
+    public function index_onExportResult()
+    {
+        return Redirect::route('report.download');
     }
 
     public function index_onLoadByFilter()

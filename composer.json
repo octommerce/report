@@ -8,6 +8,7 @@
         }
     ],
     "require": {
-    	"khill/lavacharts": "*"
+    	"khill/lavacharts": "*",
+        "maatwebsite/excel": "~2.1.0"
     }
 }

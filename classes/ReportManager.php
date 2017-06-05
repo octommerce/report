@@ -2,6 +2,7 @@
 
 use Db;
 use Lava;
+use Cache;
 use Carbon\Carbon;
 use RainLab\User\Models\User;
 use Octommerce\Octommerce\Models\Order;
@@ -315,6 +316,8 @@ class ReportManager
             return $product;
         });
 
+        $this->cacheForever('productReportData', $products);
+
         return $products;
     }
 
@@ -354,6 +357,8 @@ class ReportManager
 
             return $category;
         });
+
+        $this->cacheForever('categoryReportData', $categories);
 
         return $categories;
     }
@@ -395,6 +400,8 @@ class ReportManager
             return $brand;
         });
 
+        $this->cacheForever('brandReportData', $brands);
+
         return $brands;
     }
 
@@ -435,6 +442,8 @@ class ReportManager
             return $paymentMethod;
         });
 
+        $this->cacheForever('paymentMethodReportData', $paymentMethods);
+
         return $paymentMethods;
     }
 
@@ -474,6 +483,8 @@ class ReportManager
 
             return $location;
         });
+
+        $this->cacheForever('locationReportData', $locations);
 
         return $locations;
     }
@@ -543,5 +554,16 @@ class ReportManager
         ];
 
         return $date;
+    }
+
+    private function cacheForever($key, $collection)
+    {
+        if (Cache::get($key)) {
+            Cache::forget($key);
+        }
+
+        return Cache::rememberForever($key, function() use ($collection) {
+            return $collection->toArray();
+        });
     }
 }
