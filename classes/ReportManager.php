@@ -562,8 +562,6 @@ class ReportManager
             Cache::forget($key);
         }
 
-        return Cache::rememberForever($key, function() use ($collection) {
-            return $collection->toArray();
-        });
+        return Cache::forever($key, $collection->toArray());
     }
 }
