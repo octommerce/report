@@ -1,0 +1,13 @@
+columns:
+    sku:
+        label: SKU
+    brand:
+        label: Brand
+    name:
+        label: Name
+    sales:
+        label: Sales
+    revenue:
+        label: Revenue
+    percentage:
+        label: Percentage

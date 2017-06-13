@@ -1,0 +1,9 @@
+# ===================================
+#  Import/Export Behavior Config
+# ===================================
+
+export:
+    title: Export subscribers
+    modelClass: Octommerce\Report\Models\BrandExport
+    list: $/octommerce/report/models/brandexport/columns.yaml
+    form: $/octommerce/report/models/brandexport/fields.yaml

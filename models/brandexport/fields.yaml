@@ -1,0 +1,19 @@
+# ===================================
+#  Form Field Definitions
+# ===================================
+
+fields:
+    start_date:
+        label: Start Date
+        type: datepicker
+        mode: date
+        span: auto
+    end_date:
+        label: End Date
+        type: datepicker
+        mode: date
+        span: auto
+    brands:
+        label: Brand Filter
+        type: checkboxlist
+        comment: '*Leave blank to select all'
