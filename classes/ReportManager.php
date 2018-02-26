@@ -175,7 +175,7 @@ class ReportManager
                 $rawFormat = 'DATE(date)';
                 break; 
             case 'month':
-                $rawFormat = 'MONTH(date)';
+                $rawFormat = 'concat(MONTH(date), YEAR(date))';
                 break; 
             case 'week':
                 $rawFormat = 'WEEKOFYEAR(date)';
@@ -200,7 +200,7 @@ class ReportManager
                 $rawFormat = 'DATE(created_at)';
                 break; 
             case 'month':
-                $rawFormat = 'MONTH(created_at)';
+                $rawFormat = 'DATE(created_at)';
                 break; 
             case 'week':
                 $rawFormat = 'WEEKOFYEAR(created_at)';
@@ -225,7 +225,7 @@ class ReportManager
                 $dateFormated = Carbon::parse($date)->format('M d, Y');
                 break; 
             case 'month':
-                $dateFormated = Carbon::parse($date)->format('M');
+                $dateFormated = Carbon::parse($date)->format('M Y');
                 break; 
             case 'week':
                 $dateFormated = Carbon::parse($date)->format('W');
