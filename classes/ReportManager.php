@@ -309,7 +309,7 @@ class ReportManager
             }
         }
 
-        $products = $products->sortByDesc('revenue')->take(10)->map(function($product) use ($totalRevenue) {
+        $products = $products->sortByDesc('revenue')->take(100)->map(function($product) use ($totalRevenue) {
             $product['avg_price'] = $product['revenue'] / $product['sales'];
             $product['percentage'] = $product['revenue'] / $totalRevenue * 100;
 
@@ -352,7 +352,7 @@ class ReportManager
             }
         }
 
-        $categories = $categories->sortByDesc('revenue')->take(10)->map(function($category) use ($totalRevenue) {
+        $categories = $categories->sortByDesc('revenue')->take(100)->map(function($category) use ($totalRevenue) {
             $category['percentage'] = $category['revenue'] / $totalRevenue * 100;
 
             return $category;
@@ -394,7 +394,7 @@ class ReportManager
             }
         }
 
-        $brands = $brands->sortByDesc('revenue')->take(10)->map(function($brand) use ($totalRevenue) {
+        $brands = $brands->sortByDesc('revenue')->take(100)->map(function($brand) use ($totalRevenue) {
             $brand['percentage'] = $brand['revenue'] / $totalRevenue * 100;
 
             return $brand;
@@ -436,7 +436,7 @@ class ReportManager
             }
         }
 
-        $paymentMethods = $paymentMethods->sortByDesc('revenue')->take(10)->map(function($paymentMethod) use ($totalRevenue) {
+        $paymentMethods = $paymentMethods->sortByDesc('revenue')->take(100)->map(function($paymentMethod) use ($totalRevenue) {
             $paymentMethod['percentage'] = $paymentMethod['revenue'] / $totalRevenue * 100;
 
             return $paymentMethod;
@@ -478,7 +478,7 @@ class ReportManager
             $totalRevenue += $order->total;
         }
 
-        $locations = $locations->sortByDesc('revenue')->take(10)->map(function($location) use ($totalRevenue) {
+        $locations = $locations->sortByDesc('revenue')->take(100)->map(function($location) use ($totalRevenue) {
             $location['percentage'] = $location['revenue'] / $totalRevenue * 100;
 
             return $location;
